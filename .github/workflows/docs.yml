@@ -1,0 +1,32 @@
+name: docs
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            docs-site/package-lock.json
+            search-api/package-lock.json
+      - run: npm install
+      - run: npm --prefix docs-site install
+      - run: npm --prefix search-api install
+      - run: npm run validate:frontmatter
+      - run: npm run search:rebuild
+      - run: npm --prefix search-api test
+      - run: npm run build
+      - uses: actions/upload-artifact@v5
+        with:
+          name: cattle-handbook-docs-site
+          path: docs-site/dist

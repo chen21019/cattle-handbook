@@ -1,0 +1,20 @@
+{
+  "name": "cattle-handbook-workspace",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Rancher 1.6 legacy maintenance handbook workspace.",
+  "scripts": {
+    "bootstrap": "npm --prefix docs-site install && npm --prefix search-api install",
+    "build": "npm --prefix docs-site run build",
+    "dev": "npm --prefix docs-site run dev -- --host 127.0.0.1",
+    "validate:frontmatter": "node tools/search-index/validate-frontmatter.mjs",
+    "search:chunk": "node tools/search-index/chunk-docs.mjs",
+    "search:bm25": "node tools/search-index/build-bm25-index.mjs",
+    "search:vector": "node tools/search-index/build-vector-index.mjs",
+    "search:validate": "node tools/search-index/validate-search-index.mjs",
+    "search:smoke": "node tools/search-index/search-smoke-test.mjs",
+    "search:rebuild": "npm run search:chunk && npm run search:bm25 && npm run search:vector && npm run search:validate && npm run search:smoke",
+    "verify": "npm run validate:frontmatter && npm run search:rebuild && npm run build"
+  },
+  "devDependencies": {}
+}
