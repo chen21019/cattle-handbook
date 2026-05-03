@@ -1,102 +1,73 @@
 ---
-title: "Patch 工作流程"
-description: "Patch 工作流程：定義 legacy 維護、patch、review 與 release 流程。"
+title: "修補工作流程"
+description: "Rancher 1.6 舊版 分支的修補、審查、驗證與回復方案 流程。"
 audience:
   - human-maintainer
   - ai-agent
 tags:
   - rancher-1.6
   - maintenance
-  - maintenance
 diagram_required: true
 search_priority: high
-last_verified: "2026-05-02"
+last_verified: "2026-05-03"
 ---
 
-## 適用讀者
-本頁服務需要實用起點的人類維護者，以及需要明確安全邊界的 AI Agent。
+## 流程定位
 
-## 目的
-Operational workflow for safe Rancher 1.6 patches. 相關 repository、依賴或工作流程改變時，必須同步更新本頁。
+這份流程適用於 18 個 `rancher-1.6-*` 儲存庫 的維護 修補。它假設系統仍需要保留 Rancher 1.6 的 API、agent、catalog、metadata、DNS、network、storage 與 Docker image 相容性。
+
+## Patch 五階段
+
+| 階段 | 產物 | 不能省略的證據 |
+| --- | --- | --- |
+| 1. 定位 | affected 儲存庫/path 清單 | `rg` 搜尋結果、build file、測試位置 |
+| 2. 分流 | bug / dependency / CVE / build / docs 分類 | 風險矩陣或 處理手冊 連結 |
+| 3. 修改 | 最小 修補 | changed files 不含無關格式化 |
+| 4. 驗證 | 儲存庫-specific 指令與結果 | 失敗輸出也要保留 |
+| 5. 發佈準備 | 發版 note、回復方案、operator warning | 已查證風險說明不可移除 |
+
+## 常見 儲存庫 流程
+
+- `rancher-1.6-cattle`：先鎖定 Maven module、API/DB 影響，再跑該 module 測試或最小 Maven build。
+- `rancher-1.6-agent` / `host-api`：先確認 Go package、host event fixture、Docker socket/host stats 行為。
+- `rancher-1.6-rancher`：先確認 image build chain、agent-base、Windows/Linux image tag 與 server packaging。
+- `rancher-1.6-storage` / `lb-controller` / `dns` / `net`：先確認 package Dockerfile 與 provider-specific 行為。
+- `rancher-1.6-rancher-catalog`：先檢查 template version、compose file、image tag 與 operator-facing default。
+
+## 審查檢查清單
+
+- 變更是否只碰必要 儲存庫？
+- 是否新增或更新最小測試？
+- 是否更新相關文件、Mermaid 圖與搜尋索引？
+- 是否列出不能驗證的部分與原因？
+- 回復方案 是否包含 image、DB、catalog template 或 operator config？
 
 ## 人類維護者檢查清單
-- 確認受影響的 Rancher 1.6 repository 與 branch。
-- 對照 legacy 行為與 API 相容性。
-- 保留明確的 build、test、Docker 與 database 驗證證據。
-- 若有使用者可見行為變更，必須更新 release notes。
 
-## AI Agent 檢查清單
-- 編輯前先閱讀 `AGENTS.md`。
-- 先產出包含範圍、風險、驗證與 rollback 的任務摘要。
-- 優先採用最小 patch，避免無關格式化變更。
-- 保留 EOL 與 production 風險警告。
+- 確認 修補 已完成定位、分流、修改、驗證、發佈準備五階段。
+- 對 high-risk dependency、Docker image、DB migration 要求額外審查。
+- 發版 note 必須保留 已查證風險與回復方案 caveat。
 
-## 驗證指令佔位
-```powershell
-git status --short
-npm run validate:frontmatter
-npm run search:smoke
-npm run build
-```
+## AI Agent 作業契約
 
-## 風險
-- Rancher 1.6 屬於 legacy/EOL，可能仍有未修補 CVE。
-- 現代 Java、Go、Node、Docker 與資料庫行為可能破壞舊版假設。
-- 必須保留 server、agent、metadata、DNS、catalog 與 UI 相容性。
-
-## 下一步閱讀
-- [Repository Map](/getting-started/repository-map/)
-- [Risk Matrix](/dependency-map/risk-matrix/)
-- [Safe Editing Rules](/ai-guide/safe-editing-rules/)
-
-## AI Agent Contract
-
-### 必須先讀
-- `README.md`
-- `AGENTS.md`
-- `docs-site/src/content/docs/ai-guide/index.md`
-- `docs-site/src/content/docs/getting-started/repository-map.md`
-- `docs-site/src/content/docs/dependency-map/risk-matrix.md`
-
-### 允許動作
-- 檢查檔案與 build metadata。
-- 提出小範圍修改。
-- 更新文件、圖表與驗證證據。
-
-### 禁止動作
-- 不可移除 EOL / security disclaimer。
-- 不可進行大規模格式化 churn。
-- 沒有明確相容性計畫時，不可更動 major dependencies。
-- 不可為了讓 build 通過而刪除測試。
-
-### 必要檢查
-- 編輯前檢查 git status。
-- 識別受影響 repo 與 legacy 相容性範圍。
-- 執行最窄且相關的驗證指令。
-
-### 驗證
-在 repo-specific 指令被驗證前，先使用下方指令作為佔位。
-
-### 回滾
-只回滾自己的變更，保留使用者工作，並記錄需要 rollback 的原因。
-
-### 輸出格式
-回報 changed files、summary、tests run、tests not run and why、known risks 與 next steps。
-
+- 不可略過 儲存庫-specific 驗證說明。
+- 不可用 broad formatting 掩蓋 修補。
+- 必須回報未測項目與原因。
 
 ## 圖表
 
 ```mermaid
-flowchart TD
-  A[Read this page] --> B[Identify affected repo]
-  B --> C[Check compatibility policy]
-  C --> D[Plan smallest safe action]
-  D --> E[Run verification commands]
-  E --> F[Record evidence]
+flowchart LR
+  A[定位 儲存庫/path] --> B[風險分流]
+  B --> C[最小 修補]
+  C --> D[儲存庫-specific 驗證]
+  D --> E{結果通過?}
+  E -- 否 --> F[回滾或縮小範圍]
+  E -- 是 --> G[文件/搜尋索引/發版 note]
+  F --> A
 ```
 
-圖名：Patch Workflow 流程
-用途：把 Patch Workflow 轉成可執行的維護流程。
-AI 用途：AI Agent 可依此拆解任務、驗證結果並回報。
-維護注意：若流程、指令或禁止事項改變，必須同步更新此圖。
-
+圖名：Rancher 1.6 修補 workflow
+用途：把 修補 從定位到發佈準備串成可審核流程。
+AI 用途：AI Agent 的 final answer 必須對應這五階段。
+維護注意：新增 CI 或 儲存庫-specific test 後，請更新常見 儲存庫 流程。

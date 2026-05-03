@@ -19,7 +19,7 @@ Build and maintain the Rancher 1.6 Legacy Maintenance Handbook for human maintai
 - Do not delete tests or mock away real failures.
 - Do not add unexplained external services.
 - Do not disable security checks just to make builds pass.
-- Do not remove EOL, production-risk, or security disclaimers.
+- Do not remove source-backed risk or security notes.
 - Do not use unlicensed anime or mascot images.
 
 ## Common Checks
@@ -48,11 +48,11 @@ Run the narrowest relevant repo tests first, then docs verification for document
 
 ## Dependency Upgrade Rules
 
-Upgrade one dependency at a time unless a dedicated migration plan explains why a group change is required. Record current version, latest checked version, risk, EOL status, security sensitivity, direct-upgrade safety, compatibility shim need, and verification.
+Upgrade one dependency at a time unless a dedicated migration plan explains why a group change is required. Record current version, latest checked version, risk, security sensitivity, direct-upgrade safety, compatibility shim need, and verification source.
 
 ## Security Patch Rules
 
-Security work must include threat model, affected path, exploitability, mitigation, verification, rollback, and operator warning. Rancher 1.6 remains legacy/EOL after individual patches.
+Security work must include threat model, affected path, exploitability, mitigation, verification, rollback, and source-backed operator notes. Do not state support status unless a cited source proves it.
 
 ## Rancher 1.6 Compatibility Policy
 

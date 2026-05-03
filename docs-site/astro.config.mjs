@@ -3,6 +3,9 @@ import starlight from '@astrojs/starlight';
 
 export default defineConfig({
   site: 'https://chen21019.github.io/cattle-handbook',
+  devToolbar: {
+    enabled: false
+  },
   integrations: [
     starlight({
       title: 'Cattle 維護手冊',
@@ -19,10 +22,22 @@ export default defineConfig({
       },
       defaultLocale: 'root',
       logo: {
-        src: './public/assets/cattle-chan.png',
+        src: './public/assets/cattle-chan-v2.png',
         alt: 'Cattle 維護手冊原創櫻花系維護妹子'
       },
       customCss: ['./src/styles/sakura-theme.css'],
+      components: {
+        MarkdownContent: './src/components/MarkdownContent.astro'
+      },
+      head: [
+        {
+          tag: 'script',
+          attrs: {
+            src: '/search-runtime.js',
+            defer: true
+          }
+        }
+      ],
       social: [
         {
           icon: 'github',
@@ -38,10 +53,10 @@ export default defineConfig({
         { label: '開始維護', autogenerate: { directory: 'getting-started' } },
         { label: '架構', autogenerate: { directory: 'architecture' } },
         { label: '建置與測試', autogenerate: { directory: 'build-and-test' } },
-        { label: '升級', items: [{ label: '依賴升級 Runbook', slug: 'runbooks/dependency-upgrade' }] },
+        { label: '升級', items: [{ label: '依賴升級處理手冊', slug: 'runbooks/dependency-upgrade' }] },
         { label: '安全', autogenerate: { directory: 'security' } },
         { label: 'AI 維護指南', autogenerate: { directory: 'ai-guide' } },
-        { label: 'Runbooks', autogenerate: { directory: 'runbooks' } },
+        { label: '處理手冊', autogenerate: { directory: 'runbooks' } },
         { label: 'API 地圖', autogenerate: { directory: 'api-map' } },
         { label: '依賴地圖', autogenerate: { directory: 'dependency-map' } },
         { label: '搜尋', autogenerate: { directory: 'search' } },

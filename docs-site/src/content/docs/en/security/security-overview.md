@@ -1,6 +1,6 @@
 ---
 title: "Security Overview"
-description: "Security posture for a legacy/EOL platform."
+description: "Source-backed security posture and verification workflow."
 audience:
   - human-maintainer
   - ai-agent
@@ -17,7 +17,7 @@ last_verified: "2026-05-02"
 This page serves human maintainers who need a practical starting point and AI agents that need explicit safety boundaries.
 
 ## Purpose
-Security posture for a legacy/EOL platform. It should be updated whenever the related repository, dependency, or workflow changes.
+Source-backed security posture and verification workflow. It should be updated whenever the related repository, dependency, or workflow changes.
 
 ## Human Maintainer Checklist
 - Confirm the affected Rancher 1.6 repository and branch.
@@ -29,9 +29,9 @@ Security posture for a legacy/EOL platform. It should be updated whenever the re
 - Read `AGENTS.md` before editing.
 - Produce a task summary with scope, risk, verification, and rollback.
 - Prefer the smallest patch and avoid unrelated formatting changes.
-- Keep EOL and production-risk warnings intact.
+- Keep source-backed risk notes intact.
 
-## Verification Commands Placeholder
+## Verification Commands
 ```powershell
 git status --short
 npm run validate:frontmatter
@@ -40,7 +40,7 @@ npm run build
 ```
 
 ## Risks
-- Rancher 1.6 is legacy/EOL and may contain unpatched CVEs.
+- Rancher 1.6 risk status must be verified against actual dependencies, images, CVEs, and official sources before being stated.
 - Modern Java, Go, Node, Docker, and database behavior can break old assumptions.
 - Server, agent, metadata, DNS, catalog, and UI compatibility must be preserved.
 
@@ -64,7 +64,7 @@ npm run build
 - Update documentation, diagrams, and verification evidence.
 
 ### Forbidden actions
-- Do not remove EOL/security disclaimers.
+- Do not remove source-backed security notes.
 - Do not perform broad formatting churn.
 - Do not change major dependencies without an explicit compatibility plan.
 - Do not delete tests to make a build pass.
@@ -75,7 +75,7 @@ npm run build
 - Run the narrowest relevant validation commands.
 
 ### Verification
-Use the commands below as placeholders until a repo-specific command is proven.
+Add repo-specific commands for code changes; the commands below only verify the docs site and indexes.
 
 ### Rollback
 Revert only your own changes, preserve user work, and document why rollback was needed.
@@ -99,4 +99,3 @@ flowchart TD
 用途：把 Security Overview 轉成可執行的維護流程。
 AI 用途：AI Agent 可依此拆解任務、驗證結果並回報。
 維護注意：若流程、指令或禁止事項改變，必須同步更新此圖。
-

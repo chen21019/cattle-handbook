@@ -29,9 +29,9 @@ Search index freshness and smoke test rules. It should be updated whenever the r
 - Read `AGENTS.md` before editing.
 - Produce a task summary with scope, risk, verification, and rollback.
 - Prefer the smallest patch and avoid unrelated formatting changes.
-- Keep EOL and production-risk warnings intact.
+- Keep source-backed risk notes intact.
 
-## Verification Commands Placeholder
+## Verification Commands
 ```powershell
 git status --short
 npm run validate:frontmatter
@@ -40,7 +40,7 @@ npm run build
 ```
 
 ## Risks
-- Rancher 1.6 is legacy/EOL and may contain unpatched CVEs.
+- Rancher 1.6 risk status must be verified against actual dependencies, images, CVEs, and official sources before being stated.
 - Modern Java, Go, Node, Docker, and database behavior can break old assumptions.
 - Server, agent, metadata, DNS, catalog, and UI compatibility must be preserved.
 
@@ -64,7 +64,7 @@ npm run build
 - Update documentation, diagrams, and verification evidence.
 
 ### Forbidden actions
-- Do not remove EOL/security disclaimers.
+- Do not remove source-backed security notes.
 - Do not perform broad formatting churn.
 - Do not change major dependencies without an explicit compatibility plan.
 - Do not delete tests to make a build pass.
@@ -75,7 +75,7 @@ npm run build
 - Run the narrowest relevant validation commands.
 
 ### Verification
-Use the commands below as placeholders until a repo-specific command is proven.
+Add repo-specific commands for code changes; the commands below only verify the docs site and indexes.
 
 ### Rollback
 Revert only your own changes, preserve user work, and document why rollback was needed.
@@ -100,4 +100,3 @@ flowchart LR
 用途：說明文件站如何結合精準字串搜尋與語意搜尋。
 AI 用途：AI Agent 可依錯誤訊息用 BM25，依任務語意用 vector search。
 維護注意：若替換 Pagefind、sqlite-vec、Qdrant 或 ranking formula，必須更新此圖。
-

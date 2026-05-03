@@ -32,7 +32,7 @@ npm run search:smoke
 ```
 
 ## Common causes
-- EOL dependency behavior changed on modern OS images.
+- Dependency or image behavior changed across environments.
 - Java, Go, Node, Docker, or database version mismatch.
 - Hidden compatibility contract between server, agent, metadata, and catalog.
 
@@ -92,4 +92,3 @@ flowchart TD
 用途：提供可重複的 troubleshooting decision tree。
 AI 用途：AI Agent 必須先做 first checks，再小步修正與驗證。
 維護注意：新增常見原因或 rollback 方式時要同步更新此圖。
-

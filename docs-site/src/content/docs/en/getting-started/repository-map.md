@@ -59,7 +59,7 @@ The workspace scan found **18** `rancher-1.6-*` repositories under `C:/Users/che
 - Do not assume one repo owns a behavior until searching sibling repos.
 - Include repo/path evidence in final output.
 
-## Verification Commands Placeholder
+## Verification Commands
 
 ```powershell
 Get-ChildItem .. -Directory -Filter 'rancher-1.6-*'

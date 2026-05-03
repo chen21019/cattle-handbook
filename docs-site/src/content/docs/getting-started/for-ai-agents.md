@@ -1,6 +1,6 @@
 ---
 title: "給 AI Agent"
-description: "給 AI Agent：協助第一次接觸 Rancher 1.6 的維護者安全開始。"
+description: "AI Agent 進入 Rancher 1.6 多儲存庫 維護工作的安全入口。"
 audience:
   - human-maintainer
   - ai-agent
@@ -8,95 +8,81 @@ tags:
   - rancher-1.6
   - maintenance
   - getting-started
+  - ai-agent
 diagram_required: true
 search_priority: high
-last_verified: "2026-05-02"
+last_verified: "2026-05-03"
 ---
 
-## 適用讀者
-本頁服務需要實用起點的人類維護者，以及需要明確安全邊界的 AI Agent。
+## 先讀這頁再動手
 
-## 目的
-Entry contract and safe workflow for Codex CLI and AI maintainers. 相關 repository、依賴或工作流程改變時，必須同步更新本頁。
+這個工作區不是單一 app，而是 18 個 `rancher-1.6-*` 維護 fork。任何看似小的變更，都可能跨到 `rancher-1.6-rancher`、`rancher-1.6-cattle`、`rancher-1.6-agent`、`rancher-1.6-host-api`、`rancher-1.6-rancher-net`、`rancher-1.6-rancher-dns`、`rancher-1.6-rancher-metadata`、`rancher-1.6-scheduler`、`rancher-1.6-storage` 或 catalog/template 行為。
+
+## AI 工作順序
+
+1. 先執行 `git status --short`，確認使用者是否已有未提交工作。
+2. 用 [儲存庫地圖](/getting-started/repository-map/) 定位擁有者 儲存庫，不要只搜目前目錄。
+3. 用 [風險矩陣](/dependency-map/risk-matrix/) 判斷 Java、Go、Docker、Node/Bower 或 image 風險。
+4. 寫出任務摘要：範圍、受影響 儲存庫、相容性風險、驗證、回復方案。
+5. 只做最小 修補；跨 儲存庫 變更要拆成可驗證的小步。
+6. 執行最窄驗證，再視風險跑更廣的 build/test。
+7. 回報 changed files、tests run、tests not run、known risks、回復方案。
+
+## Repo 選擇速查
+
+| 任務 | 先看 儲存庫 | 常見證據 |
+| --- | --- | --- |
+| Server packaging / 發版 image | `rancher-1.6-rancher` | `Dockerfile`、`server/Dockerfile`、agent image references |
+| API、DB、process engine | `rancher-1.6-cattle` | `pom.xml`、Liquibase、JOOQ、service/process code |
+| Host runtime behavior | `rancher-1.6-agent`、`rancher-1.6-host-api` | `Makefile`、Godeps、hostapi tests |
+| Networking、DNS、metadata | `rancher-1.6-rancher-net`、`rancher-1.6-rancher-dns`、`rancher-1.6-rancher-metadata` | Dockerfile、Go tests、template labels |
+| Scheduling / storage / LB | `rancher-1.6-scheduler`、`rancher-1.6-storage`、`rancher-1.6-lb-controller` | package Dockerfiles、provider-specific tests |
+| Catalog/template behavior | `rancher-1.6-rancher-catalog`、`rancher-1.6-compose-executor` | catalog templates、compose fixtures |
 
 ## 人類維護者檢查清單
-- 確認受影響的 Rancher 1.6 repository 與 branch。
-- 對照 legacy 行為與 API 相容性。
-- 保留明確的 build、test、Docker 與 database 驗證證據。
-- 若有使用者可見行為變更，必須更新 release notes。
 
-## AI Agent 檢查清單
-- 編輯前先閱讀 `AGENTS.md`。
-- 先產出包含範圍、風險、驗證與 rollback 的任務摘要。
-- 優先採用最小 patch，避免無關格式化變更。
-- 保留 EOL 與 production 風險警告。
+- 審查 AI 任務摘要是否列出 affected 儲存庫s、風險、驗證與回復方案。
+- 確認 AI 沒有越界修改 sibling 儲存庫 或移除已查證風險說明。
+- 要求 儲存庫-specific 證據；文件站 `npm run verify` 不能取代實際 fork build/test。
 
-## 驗證指令佔位
+## AI Agent 作業契約
+
+- 必須先讀 `AGENTS.md`、本頁、儲存庫地圖與風險矩陣。
+- 必須保留使用者既有變更，不可 revert unrelated work。
+- 必須在 final answer 回報 changed files、tests run、tests not run、known risks、回復方案。
+
+## 禁止事項
+
+- 不可為了讓 build 過而刪測試、跳過安全檢查或移除已查證風險說明。
+- 不可把 `latest` image、major dependency upgrade 或 DB migration 當成低風險修補。
+- 不可大規模格式化 18 個 儲存庫；這會掩蓋真正行為差異。
+- 不可只更新文件站畫面卻不重建搜尋索引。
+
+## 必跑檢查
+
 ```powershell
 git status --short
-npm run validate:frontmatter
-npm run search:smoke
-npm run build
+rg --files ..\rancher-1.6-* -g AGENTS.md -g README.md -g Makefile -g pom.xml -g Dockerfile -g package.json -g bower.json -g Godeps.json
+npm run search:rebuild
 ```
-
-## 風險
-- Rancher 1.6 屬於 legacy/EOL，可能仍有未修補 CVE。
-- 現代 Java、Go、Node、Docker 與資料庫行為可能破壞舊版假設。
-- 必須保留 server、agent、metadata、DNS、catalog 與 UI 相容性。
-
-## 下一步閱讀
-- [Repository Map](/getting-started/repository-map/)
-- [Risk Matrix](/dependency-map/risk-matrix/)
-- [Safe Editing Rules](/ai-guide/safe-editing-rules/)
-
-## AI Agent Contract
-
-### 必須先讀
-- `README.md`
-- `AGENTS.md`
-- `docs-site/src/content/docs/ai-guide/index.md`
-- `docs-site/src/content/docs/getting-started/repository-map.md`
-- `docs-site/src/content/docs/dependency-map/risk-matrix.md`
-
-### 允許動作
-- 檢查檔案與 build metadata。
-- 提出小範圍修改。
-- 更新文件、圖表與驗證證據。
-
-### 禁止動作
-- 不可移除 EOL / security disclaimer。
-- 不可進行大規模格式化 churn。
-- 沒有明確相容性計畫時，不可更動 major dependencies。
-- 不可為了讓 build 通過而刪除測試。
-
-### 必要檢查
-- 編輯前檢查 git status。
-- 識別受影響 repo 與 legacy 相容性範圍。
-- 執行最窄且相關的驗證指令。
-
-### 驗證
-在 repo-specific 指令被驗證前，先使用下方指令作為佔位。
-
-### 回滾
-只回滾自己的變更，保留使用者工作，並記錄需要 rollback 的原因。
-
-### 輸出格式
-回報 changed files、summary、tests run、tests not run and why、known risks 與 next steps。
-
 
 ## 圖表
 
 ```mermaid
 flowchart TD
-  A[Read this page] --> B[Identify affected repo]
-  B --> C[Check compatibility policy]
-  C --> D[Plan smallest safe action]
-  D --> E[Run verification commands]
-  E --> F[Record evidence]
+  A[收到任務] --> B[檢查 dirty worktree]
+  B --> C[儲存庫地圖定位 儲存庫]
+  C --> D[風險矩陣判斷依賴/安全/相容性]
+  D --> E{是否跨 儲存庫?}
+  E -- 是 --> F[拆小步並定義驗證]
+  E -- 否 --> G[最小 修補]
+  F --> G
+  G --> H[執行 儲存庫-specific 驗證]
+  H --> I[更新文件與搜尋索引]
+  I --> J[回報證據與回復方案]
 ```
 
-圖名：For AI Agents 流程
-用途：把 For AI Agents 轉成可執行的維護流程。
-AI 用途：AI Agent 可依此拆解任務、驗證結果並回報。
-維護注意：若流程、指令或禁止事項改變，必須同步更新此圖。
-
+圖名：AI Agent Rancher 1.6 維護入口
+用途：讓 AI 在改 code 前先定位 儲存庫、風險與驗證。
+AI 用途：作為每次任務的自我檢查流程。
+維護注意：新增 fork 或改變 儲存庫 ownership 時，必須同步更新表格。

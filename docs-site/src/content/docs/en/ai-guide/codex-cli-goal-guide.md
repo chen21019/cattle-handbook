@@ -135,7 +135,7 @@ Tell the agent to split code changes by repo and ownership boundary, especially 
 - Inventory, scoped edits, tests, docs updates, and release notes.
 
 ### Forbidden actions
-- Broad formatting, hidden major upgrades, deleting tests, removing EOL disclaimers, or using unlicensed images.
+- Broad formatting, hidden major upgrades, deleting tests, removing source-backed risk notes, or using unlicensed images.
 
 ### Required checks
 - Git status, repo ownership, compatibility risk, verification, rollback.
@@ -177,4 +177,3 @@ flowchart TD
 用途：把 Codex CLI Goal Guide 轉成可執行的維護流程。
 AI 用途：AI Agent 可依此拆解任務、驗證結果並回報。
 維護注意：若流程、指令或禁止事項改變，必須同步更新此圖。
-

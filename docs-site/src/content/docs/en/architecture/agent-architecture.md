@@ -29,9 +29,9 @@ Explains host agent communication and upgrade constraints. It should be updated 
 - Read `AGENTS.md` before editing.
 - Produce a task summary with scope, risk, verification, and rollback.
 - Prefer the smallest patch and avoid unrelated formatting changes.
-- Keep EOL and production-risk warnings intact.
+- Keep source-backed risk notes intact.
 
-## Verification Commands Placeholder
+## Verification Commands
 ```powershell
 git status --short
 npm run validate:frontmatter
@@ -40,7 +40,7 @@ npm run build
 ```
 
 ## Risks
-- Rancher 1.6 is legacy/EOL and may contain unpatched CVEs.
+- Rancher 1.6 risk status must be verified against actual dependencies, images, CVEs, and official sources before being stated.
 - Modern Java, Go, Node, Docker, and database behavior can break old assumptions.
 - Server, agent, metadata, DNS, catalog, and UI compatibility must be preserved.
 
@@ -64,7 +64,7 @@ npm run build
 - Update documentation, diagrams, and verification evidence.
 
 ### Forbidden actions
-- Do not remove EOL/security disclaimers.
+- Do not remove source-backed security notes.
 - Do not perform broad formatting churn.
 - Do not change major dependencies without an explicit compatibility plan.
 - Do not delete tests to make a build pass.
@@ -75,7 +75,7 @@ npm run build
 - Run the narrowest relevant validation commands.
 
 ### Verification
-Use the commands below as placeholders until a repo-specific command is proven.
+Add repo-specific commands for code changes; the commands below only verify the docs site and indexes.
 
 ### Rollback
 Revert only your own changes, preserve user work, and document why rollback was needed.
@@ -101,4 +101,3 @@ flowchart LR
 用途：說明 Agent Architecture 在 Rancher 1.6 維護知識中的位置。
 AI 用途：AI Agent 可先定位元件，再決定是否能安全修改。
 維護注意：若 repository map 或元件責任改變，必須同步更新此圖。
-

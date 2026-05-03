@@ -1,6 +1,6 @@
 ---
 title: "安全編輯規則"
-description: "安全編輯規則：提供 AI Agent 安全維護 Rancher 1.6 的操作契約。"
+description: "AI Agent 維護 Rancher 1.6 多儲存庫 fork 時必須遵守的安全編輯契約。"
 audience:
   - human-maintainer
   - ai-agent
@@ -10,93 +10,76 @@ tags:
   - ai-guide
 diagram_required: true
 search_priority: high
-last_verified: "2026-05-02"
+last_verified: "2026-05-03"
 ---
 
-## 適用讀者
-本頁服務需要實用起點的人類維護者，以及需要明確安全邊界的 AI Agent。
+## 核心原則
 
-## 目的
-Forbidden actions and required checks before code changes. 相關 repository、依賴或工作流程改變時，必須同步更新本頁。
+Rancher 1.6 的安全與相容性狀態必須以 儲存庫/path、版本、來源與測試證據查證；安全編輯的目標是留下可回溯證據，而不是補上未查證結論。
+
+## 編輯前必須回答
+
+| 問題 | 為什麼重要 |
+| --- | --- |
+| 哪些 `rancher-1.6-*` 儲存庫 受影響？ | server、agent、metadata、DNS、net、catalog 可能共享行為契約。 |
+| 是否碰到 API、DB schema、Docker image、old agent compatibility？ | 這些都是 舊版 operator 最容易被破壞的面。 |
+| 變更是 pin、shim、修補 還是 major upgrade？ | major upgrade 必須走 migration 設計，不可混在 bug fix。 |
+| 最小驗證指令是什麼？ | 沒有驗證就不可宣稱完成。 |
+| 回復方案 會不會涉及 DB 或 image 狀態？ | 有些變更不能只靠 revert 程式碼還原。 |
+
+## 允許的修改
+
+- 小範圍 bug fix、compatibility shim、文件補強、搜尋索引更新。
+- 單一依賴的可驗證 修補，且有風險矩陣條目與回復方案。
+- 新增 regression test 或把既有測試指令文件化。
 
 ## 人類維護者檢查清單
-- 確認受影響的 Rancher 1.6 repository 與 branch。
-- 對照 legacy 行為與 API 相容性。
-- 保留明確的 build、test、Docker 與 database 驗證證據。
-- 若有使用者可見行為變更，必須更新 release notes。
+
+- 檢查 AI 是否回答 API、DB、Docker image、old agent compatibility 影響。
+- 檢查 changed files 是否符合任務範圍。
+- 合併前要求 儲存庫-specific 驗證或明確未驗證原因。
 
 ## AI Agent 檢查清單
-- 編輯前先閱讀 `AGENTS.md`。
-- 先產出包含範圍、風險、驗證與 rollback 的任務摘要。
-- 優先採用最小 patch，避免無關格式化變更。
-- 保留 EOL 與 production 風險警告。
 
-## 驗證指令佔位
+- 編輯前確認 dirty worktree。
+- 修改前定位 儲存庫 ownership。
+- 修改後同步文件、圖表與搜尋索引。
+
+## 禁止的修改
+
+- 刪除測試、降低安全檢查、移除已查證的風險說明。
+- 同時升級多個 high-risk dependency。
+- 無證據地改 Docker base image、Windows nanoserver tag、agent-base tag。
+- 大規模格式化 Java/Go/JS 檔案。
+- 把 `rancher-1.6-cattle` 的 API 或 DB 行為改成只符合現代框架預設。
+
+## 驗證梯度
+
 ```powershell
 git status --short
-npm run validate:frontmatter
-npm run search:smoke
-npm run build
+rg -n "dependency|Dockerfile|pom.xml|Godeps|bower|agent|metadata|dns|catalog" docs-site/src/content/docs
+npm run verify
 ```
 
-## 風險
-- Rancher 1.6 屬於 legacy/EOL，可能仍有未修補 CVE。
-- 現代 Java、Go、Node、Docker 與資料庫行為可能破壞舊版假設。
-- 必須保留 server、agent、metadata、DNS、catalog 與 UI 相容性。
-
-## 下一步閱讀
-- [Repository Map](/getting-started/repository-map/)
-- [Risk Matrix](/dependency-map/risk-matrix/)
-- [Safe Editing Rules](/ai-guide/safe-editing-rules/)
-
-## AI Agent Contract
-
-### 必須先讀
-- `README.md`
-- `AGENTS.md`
-- `docs-site/src/content/docs/ai-guide/index.md`
-- `docs-site/src/content/docs/getting-started/repository-map.md`
-- `docs-site/src/content/docs/dependency-map/risk-matrix.md`
-
-### 允許動作
-- 檢查檔案與 build metadata。
-- 提出小範圍修改。
-- 更新文件、圖表與驗證證據。
-
-### 禁止動作
-- 不可移除 EOL / security disclaimer。
-- 不可進行大規模格式化 churn。
-- 沒有明確相容性計畫時，不可更動 major dependencies。
-- 不可為了讓 build 通過而刪除測試。
-
-### 必要檢查
-- 編輯前檢查 git status。
-- 識別受影響 repo 與 legacy 相容性範圍。
-- 執行最窄且相關的驗證指令。
-
-### 驗證
-在 repo-specific 指令被驗證前，先使用下方指令作為佔位。
-
-### 回滾
-只回滾自己的變更，保留使用者工作，並記錄需要 rollback 的原因。
-
-### 輸出格式
-回報 changed files、summary、tests run、tests not run and why、known risks 與 next steps。
-
+Repo-specific 驗證必須依實際修改補上，例如 `Makefile`、Maven module test、Go package test、Docker build 或 catalog template fixture。
 
 ## 圖表
 
 ```mermaid
 flowchart TD
-  A[Read this page] --> B[Identify affected repo]
-  B --> C[Check compatibility policy]
-  C --> D[Plan smallest safe action]
-  D --> E[Run verification commands]
-  E --> F[Record evidence]
+  A[準備編輯] --> B{有 dirty user work?}
+  B -- 是 --> C[保留並避開使用者變更]
+  B -- 否 --> D[定位 儲存庫 ownership]
+  C --> D
+  D --> E{碰 API/DB/Docker/agent?}
+  E -- 是 --> F[提高風險等級並補 回復方案]
+  E -- 否 --> G[最小 修補]
+  F --> G
+  G --> H[儲存庫-specific 驗證]
+  H --> I[文件/索引同步]
 ```
 
-圖名：Safe Editing Rules 流程
-用途：把 Safe Editing Rules 轉成可執行的維護流程。
-AI 用途：AI Agent 可依此拆解任務、驗證結果並回報。
-維護注意：若流程、指令或禁止事項改變，必須同步更新此圖。
-
+圖名：安全編輯決策
+用途：避免 AI 直接動 舊版 高風險區域。
+AI 用途：每次 修補 前逐項檢查。
+維護注意：如果新增驗證工具，請同步更新驗證梯度。

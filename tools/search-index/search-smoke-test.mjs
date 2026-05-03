@@ -3,7 +3,7 @@ const { chunks } = readJson('bm25-index.json');
 const queries = [
   { query: 'build failure', expectedPaths: ['runbooks/build-failure.md', 'en/runbooks/build-failure.md'] },
   { query: 'dependency upgrade', expectedPaths: ['runbooks/dependency-upgrade.md', 'en/runbooks/dependency-upgrade.md'] },
-  { query: 'CVE', expectedPaths: ['security/known-eol-risks.md', 'security/dependency-vulnerability-triage.md', 'en/security/known-eol-risks.md'] },
+  { query: 'CVE', expectedPaths: ['security/verified-risk-notes.md', 'security/dependency-vulnerability-triage.md', 'en/security/verified-risk-notes.md'] },
   { query: 'agent compatibility', expectedPaths: ['ai-guide/agent-readable-contract.md', 'getting-started/for-ai-agents.md', 'en/ai-guide/agent-readable-contract.md'] },
   { query: 'API auth', expectedPaths: ['api-map/auth-api.md', 'en/api-map/auth-api.md'] },
   { query: 'docker build', expectedPaths: ['build-and-test/docker-build.md', 'runbooks/docker-image-error.md', 'en/build-and-test/docker-build.md'] },

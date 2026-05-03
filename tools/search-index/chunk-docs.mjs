@@ -1,6 +1,6 @@
 import path from 'node:path';
 import fs from 'node:fs';
-import { docsRoot, listMarkdown, parseFrontmatter, stableId, writeJson } from './shared.mjs';
+import { docsRoot, listMarkdown, parseFrontmatter, root, stableId, writeJson } from './shared.mjs';
 
 const chunks = [];
 for (const file of listMarkdown()) {
@@ -29,5 +29,11 @@ for (const file of listMarkdown()) {
     });
   });
 }
-writeJson('chunks.json', { generated_at: new Date().toISOString(), chunks });
+const payload = { generated_at: new Date().toISOString(), chunks };
+writeJson('chunks.json', payload);
+
+const publicSearchRoot = path.join(root, 'docs-site', 'public', 'search-index');
+fs.mkdirSync(publicSearchRoot, { recursive: true });
+fs.writeFileSync(path.join(publicSearchRoot, 'chunks.json'), JSON.stringify(payload));
+
 console.log('chunked ' + chunks.length + ' docs chunks');

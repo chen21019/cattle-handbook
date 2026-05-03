@@ -20,6 +20,6 @@ npm run dev
 
 The documentation site runs from `docs-site/`. The repository inventory is generated from sibling `../rancher-1.6-*` repositories.
 
-## Maintenance Warnings
+## Maintenance Notes
 
-Rancher 1.6 is legacy/EOL software. This handbook documents risk reduction, reproducible builds, compatibility preservation, and careful patch workflow. It does not claim that Rancher 1.6 can be made equivalent to a modern supported security platform.
+This handbook documents reproducible builds, compatibility preservation, dependency inventory, and careful patch workflow. Security, CVE, image, and support-status claims must be backed by sources before they are written as conclusions.

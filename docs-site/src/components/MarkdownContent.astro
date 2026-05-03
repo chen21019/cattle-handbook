@@ -1,0 +1,69 @@
+---
+import DefaultMarkdownContent from '@astrojs/starlight/components/MarkdownContent.astro';
+---
+
+<DefaultMarkdownContent><slot /></DefaultMarkdownContent>
+
+<script>
+  import mermaid from 'mermaid';
+
+  const themeVariables = {
+    primaryColor: '#fff5fa',
+    primaryTextColor: '#241421',
+    primaryBorderColor: '#e92676',
+    lineColor: '#7a4bd8',
+    secondaryColor: '#dff7ed',
+    tertiaryColor: '#fff2b8',
+    noteBkgColor: '#ffffff',
+    noteTextColor: '#241421',
+    fontFamily: 'ui-sans-serif, system-ui, sans-serif'
+  };
+
+  mermaid.initialize({
+    startOnLoad: false,
+    securityLevel: 'strict',
+    theme: 'base',
+    themeVariables
+  });
+
+  let renderRun = 0;
+
+  async function renderMermaidBlocks() {
+    const blocks = Array.from(document.querySelectorAll('pre[data-language="mermaid"], pre code.language-mermaid, pre code.mermaid'));
+    if (!blocks.length) return;
+
+    for (const code of blocks) {
+      const pre = code.matches('pre') ? code : code.closest('pre');
+      if (!pre || pre.dataset.mermaidRendered === 'true') continue;
+      pre.dataset.mermaidRendered = 'true';
+
+      const renderedLines = Array.from(pre.querySelectorAll('.ec-line')).map((line) => line.textContent || '');
+      const source = (renderedLines.length ? renderedLines.join('\n') : pre.textContent || '').trim();
+      if (!source) continue;
+
+      const target = document.createElement('figure');
+      target.className = 'mermaid-rendered';
+      target.setAttribute('aria-label', 'Mermaid diagram');
+
+      try {
+        const id = `mermaid-${Date.now()}-${renderRun++}`;
+        const result = await mermaid.render(id, source);
+        target.innerHTML = result.svg;
+        const wrapper = pre.closest('.expressive-code') || pre.closest('figure.frame') || pre;
+        wrapper.replaceWith(target);
+      } catch (error) {
+        pre.dataset.mermaidError = 'true';
+        pre.classList.add('mermaid-error');
+        const message = document.createElement('div');
+        message.className = 'mermaid-error-label';
+        message.textContent = 'Mermaid 圖表渲染失敗，已保留原始碼供維護者檢查。';
+        pre.before(message);
+        console.error('Mermaid render failed', error);
+      }
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', renderMermaidBlocks);
+  document.addEventListener('astro:page-load', renderMermaidBlocks);
+  renderMermaidBlocks();
+</script>
